@@ -1,0 +1,132 @@
+﻿@page "/"
+@using WebUi.Services
+@using WebUi.Swagger
+@inject IPatientService patientService
+
+<Row>
+    <Column>
+        <Card Margin="Margin.Is4.OnY">
+            <CardHeader>
+                <CardTitle>Patients</CardTitle>
+            </CardHeader>
+            <CardBody>
+                <DataGrid @ref="dataGrid"
+                          TItem="Patient"
+                          Data="patients"
+                          Responsive
+                          ShowPager
+                          ShowPageSizes
+                          RowInserting="@OnRowInserting"
+                          RowUpdating="@OnRowUpdating"
+                          RowRemoving="@OnRowRemoving"
+                          @bind-SelectedRow="@selectedPatient"
+                          Editable
+                          EditMode="DataGridEditMode.Popup"
+                          UseValidation
+                          ValidationsSummaryLabel="The following validation errors have occurred..."
+                          ShowValidationsSummary>
+                    <DataGridColumns>
+                        <DataGridCommandColumn TItem="Patient"></DataGridCommandColumn>
+                        <DataGridColumn TextAlignment="TextAlignment.Center" TItem="Patient" Field="@nameof( Patient.Id )" Caption="#" Width="60px" />
+                        <DataGridColumn TItem="Patient" Field="@nameof( Patient.FirstName )" Caption="First Name" Editable />
+                        <DataGridColumn TItem="Patient" Field="@nameof( Patient.LastName )" Caption="Last Name" Editable />
+                        <DataGridColumn TItem="Patient" Field="@nameof( Patient.Address )" Caption="Address" Editable />
+                        <DataGridColumn TItem="Patient" Field="@nameof( Patient.City )" Caption="City" Editable>
+                            <CaptionTemplate>
+                                <Icon Name="IconName.City" /> @context.Caption
+                            </CaptionTemplate>
+                        </DataGridColumn>
+                        <DataGridColumn TItem="Patient" Field="@nameof( Patient.State )" Caption="State">
+                        </DataGridColumn>
+                    </DataGridColumns>
+                </DataGrid>
+            </CardBody>
+        </Card>
+    </Column>
+</Row>
+
+@code{
+    private DataGrid<Patient> dataGrid;
+    private List<Patient>? patients;
+    private Patient? selectedPatient;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var result = await patientService.SearchPatients();
+        patients = result;
+    }
+
+    private async Task OnRowInserting(CancellableRowChange<Patient, Dictionary<string, object>> e)
+    {
+        try
+        {
+            var newPatient = e.NewItem;
+            var result = await patientService.CreatePatient(newPatient);
+            patients.Add(result);
+            await dataGrid.Reload();
+        }
+        catch (Exception)
+        {
+            e.Cancel = true;
+        }
+    }
+
+    private async Task OnRowUpdating(CancellableRowChange<Patient, Dictionary<string, object>> e)
+    {
+        try
+        {
+            var newPatient = e.NewItem;
+            await patientService.UpdatePatient(newPatient.Id, newPatient);
+            var idx = patients.FindIndex(x => x == e.OldItem);
+            patients[idx] = newPatient;
+            await dataGrid.Reload();
+        }
+        catch (Exception)
+        {
+            e.Cancel = true;
+        }
+    }
+
+    private async Task OnRowRemoving(CancellableRowChange<Patient> e)
+    {
+        try
+        {
+            if (patients.Contains(e.NewItem))
+            {
+                var p = e.NewItem;
+                await patientService.DeletePatient(p.Id);
+                patients.Remove(p);
+                await dataGrid.Reload();
+            }
+        }
+        catch (Exception)
+        {
+            e.Cancel = true;
+        }
+    }
+
+    //private void OnRowInserted(SavedRowItem<Employee, Dictionary<string, object>> e)
+    //{
+    //    //var employee = e.NewItem;
+
+    //    //employee.Id = dataModels?.Max( x => x.Id ) + 1 ?? 1;
+
+    //    //dataModels.Add( employee );
+    //}
+
+    //private void OnRowUpdated(SavedRowItem<Employee, Dictionary<string, object>> e)
+    //{
+    //    //var idx = dataModels.FindIndex( x => x == e.OldItem );
+    //    //dataModels[idx] = e.NewItem;
+    //}
+
+    //private void OnRowRemoved(Employee model)
+    //{
+    //    //if ( dataModels.Contains( model ) )
+    //    //{
+    //    //    dataModels.Remove( model );
+    //    //}
+    //}
+
+}
+

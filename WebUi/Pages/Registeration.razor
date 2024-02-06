@@ -1,0 +1,85 @@
+﻿@page "/authentication/registration"
+@using WebUi.Services
+@using Blazored.LocalStorage
+@inject IUser userService
+@inject NavigationManager navigationManager
+@inject IJSRuntime js
+@inject ILocalStorageService localStorageService
+@attribute [AllowAnonymous]
+
+<Row>
+    <Column ColumnSize="ColumnSize.IsFull.OnMobile.IsHalf.OnTablet">
+        <Card Margin="Margin.Is4.OnY">
+            <CardHeader>
+                <CardTitle>Annotation Validation</CardTitle>
+            </CardHeader>
+            <CardBody>
+                <Validations Mode="ValidationMode.Auto" Model="@model">
+                    <Validation>
+                        <Field Horizontal>
+                            <FieldLabel RequiredIndicator ColumnSize="ColumnSize.IsFull.OnTablet.Is3.OnDesktop">Nane</FieldLabel>
+                            <FieldBody ColumnSize="ColumnSize.IsFull.OnTablet.Is9.OnDesktop">
+                                <TextEdit Placeholder="Enter name" @bind-Text="@model.Name">
+                                    <Feedback>
+                                        <ValidationError />
+                                    </Feedback>
+                                </TextEdit>
+                            </FieldBody>
+                        </Field>
+                    </Validation>
+                    <Validation>
+                        <Field Horizontal>
+                            <FieldLabel RequiredIndicator ColumnSize="ColumnSize.IsFull.OnTablet.Is3.OnDesktop">Email</FieldLabel>
+                            <FieldBody ColumnSize="ColumnSize.IsFull.OnTablet.Is9.OnDesktop">
+                                <TextEdit Placeholder="Enter email" @bind-Text="@model.Email">
+                                    <Feedback>
+                                        <ValidationError />
+                                    </Feedback>
+                                </TextEdit>
+                            </FieldBody>
+                        </Field>
+                    </Validation>
+                    <Validation>
+                        <Field Horizontal>
+                            <FieldLabel RequiredIndicator ColumnSize="ColumnSize.IsFull.OnTablet.Is3.OnDesktop">Password</FieldLabel>
+                            <FieldBody ColumnSize="ColumnSize.IsFull.OnTablet.Is9.OnDesktop">
+                                <TextEdit Role="TextRole.Password" Placeholder="Password" @bind-Text="@model.Password">
+                                    <Feedback>
+                                        <ValidationError />
+                                    </Feedback>
+                                </TextEdit>
+                            </FieldBody>
+                        </Field>
+                    </Validation>
+                    <Field Horizontal JustifyContent="JustifyContent.End">
+                        <FieldBody ColumnSize="ColumnSize.Is9.Is3.WithOffset">
+                            <Button Color="Color.Primary" @onclick="HandleSubmit">Register</Button>
+                        </FieldBody>
+                    </Field>
+                </Validations>
+            </CardBody>
+        </Card>
+    </Column>
+</Row>
+
+
+@code {
+    public Swagger.Registration model = new Swagger.Registration();
+
+    public async Task HandleSubmit()
+    {
+        if (model is null)
+            return;
+
+        var result = await userService.RegisterUser(model);
+        if (result.Success)
+        {
+            navigationManager.NavigateTo("/authentication/login");
+        }
+        else
+        {
+            await js.InvokeVoidAsync("alert", result.Message);
+        }
+    }
+}
+
