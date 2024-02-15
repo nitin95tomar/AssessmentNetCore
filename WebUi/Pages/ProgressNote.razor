@@ -1,0 +1,142 @@
+﻿@page "/patient/{patientId:long}/progressNotes"
+
+@using WebUi.Services
+@using WebUi.Swagger
+@using Microsoft.AspNetCore.Authorization
+@inject IProgressNoteService progressNoteService
+@attribute [Authorize]
+
+<Row>
+    <Column>
+        <Card Margin="Margin.Is4.OnY">
+            <CardHeader>
+                <CardTitle>Progress Notes</CardTitle>
+            </CardHeader>
+            <CardBody>
+                <DataGrid @ref="dataGrid"
+                          TItem="ProgressNote"
+                          Data="progressNotes"
+                          Responsive
+                          ShowPager
+                          ShowPageSizes
+                          RowInserting="@OnRowInserting"
+                          @bind-SelectedRow="@selectedNote"
+                          Editable
+                          EditMode="DataGridEditMode.Popup"
+                          CommandMode="DataGridCommandMode.ButtonRow"
+                          UseValidation
+                          ValidationsSummaryLabel="The following validation errors have occurred..."
+                          ShowValidationsSummary>
+                    <DataGridColumns>
+                        <DataGridCommandColumn TItem="ProgressNote" NewCommandAllowed="false" EditCommandAllowed="false" DeleteCommandAllowed="false">
+                            <SaveCommandTemplate>
+                                <Button ElementId="btnSave" Type="ButtonType.Submit" PreventDefaultOnSubmit Color="Color.Primary" Clicked="@context.Clicked">@context.LocalizationString</Button>
+                            </SaveCommandTemplate>
+                            <CancelCommandTemplate>
+                                <Button ElementId="btnCancel" Color="Color.Secondary" Clicked="@context.Clicked">@context.LocalizationString</Button>
+                            </CancelCommandTemplate>
+                        </DataGridCommandColumn>
+                        <DataGridColumn TextAlignment="TextAlignment.Center" TItem="ProgressNote" Field="@nameof( ProgressNote.Id )" Caption="#" Width="60px" />
+                        <DataGridColumn TItem="ProgressNote" Field="@nameof( ProgressNote.SectionName )" Caption="Section Name" Editable />
+                        <DataGridColumn TItem="ProgressNote" Field="@nameof( ProgressNote.SectionText )" Caption="Section Text" Editable />
+                    </DataGridColumns>
+                    <ButtonRowTemplate>
+                        <Button Color="Color.Success" Clicked="@context.NewCommand.Clicked">@context.NewCommand.LocalizationString</Button>
+                        <Button Color="Color.Warning" Clicked="@context.ClearFilterCommand.Clicked">@context.ClearFilterCommand.LocalizationString</Button>
+                    </ButtonRowTemplate>
+                </DataGrid>
+            </CardBody>
+        </Card>
+    </Column>
+</Row>
+
+@code{
+    [Parameter]
+    public long PatientId { get; set; }
+
+    private DataGrid<ProgressNote> dataGrid;
+    private List<ProgressNote>? progressNotes;
+    private ProgressNote? selectedNote;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var result = await progressNoteService.GetProgressNotes(PatientId);
+        progressNotes = result;
+    }
+
+    private async Task OnRowInserting(CancellableRowChange<ProgressNote, Dictionary<string, object>> e)
+    {
+        try
+        {
+            var newProgressNote = e.NewItem;
+            newProgressNote.OrganizationId = 22222;
+            newProgressNote.PatientId = PatientId;
+            var result = await progressNoteService.AddProgressNote(new List<ProgressNote>() { newProgressNote });
+            progressNotes.AddRange(result);
+            await dataGrid.Reload();
+        }
+        catch (Exception)
+        {
+            e.Cancel = true;
+        }
+    }
+
+    //private async Task OnRowUpdating(CancellableRowChange<ProgressNote, Dictionary<string, object>> e)
+    //{
+    //    try
+    //    {
+    //        var newPatient = e.NewItem;
+    //        await progressNoteService.(newPatient.Id, newPatient);
+    //        var idx = patients.FindIndex(x => x == e.OldItem);
+    //        patients[idx] = newPatient;
+    //        await dataGrid.Reload();
+    //    }
+    //    catch (Exception)
+    //    {
+    //        e.Cancel = true;
+    //    }
+    //}
+
+    //private async Task OnRowRemoving(CancellableRowChange<Patient> e)
+    //{
+    //    try
+    //    {
+    //        if (patients.Contains(e.NewItem))
+    //        {
+    //            var p = e.NewItem;
+    //            await patientService.DeletePatient(p.Id);
+    //            patients.Remove(p);
+    //            await dataGrid.Reload();
+    //        }
+    //    }
+    //    catch (Exception)
+    //    {
+    //        e.Cancel = true;
+    //    }
+    //}
+
+    //private void OnRowInserted(SavedRowItem<Employee, Dictionary<string, object>> e)
+    //{
+    //    //var employee = e.NewItem;
+
+    //    //employee.Id = dataModels?.Max( x => x.Id ) + 1 ?? 1;
+
+    //    //dataModels.Add( employee );
+    //}
+
+    //private void OnRowUpdated(SavedRowItem<Employee, Dictionary<string, object>> e)
+    //{
+    //    //var idx = dataModels.FindIndex( x => x == e.OldItem );
+    //    //dataModels[idx] = e.NewItem;
+    //}
+
+    //private void OnRowRemoved(Employee model)
+    //{
+    //    //if ( dataModels.Contains( model ) )
+    //    //{
+    //    //    dataModels.Remove( model );
+    //    //}
+    //}
+
+}
+

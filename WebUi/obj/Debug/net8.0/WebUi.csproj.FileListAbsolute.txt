@@ -1,6 +1,2 @@
 /Users/nitin/Documents/DotNet/WebAPI/WebUi/obj/Debug/net8.0/WebUi.csproj.AssemblyReference.cache
 /Users/nitin/Documents/DotNet/WebAPI/WebUi/obj/Debug/net8.0/WebUi.GeneratedMSBuildEditorConfig.editorconfig
-/Users/nitin/Documents/DotNet/WebAPI/WebUi/obj/Debug/net8.0/WebUi.AssemblyInfoInputs.cache
-/Users/nitin/Documents/DotNet/WebAPI/WebUi/obj/Debug/net8.0/WebUi.AssemblyInfo.cs
-/Users/nitin/Documents/DotNet/WebAPI/WebUi/obj/Debug/net8.0/WebUi.csproj.CoreCompileInputs.cache
-/Users/nitin/Documents/DotNet/WebAPI/WebUi/obj/Debug/net8.0/WebUi.MvcApplicationPartsAssemblyInfo.cache

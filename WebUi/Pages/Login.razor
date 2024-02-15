@@ -62,6 +62,8 @@
         if (result.Success)
         {
             await localStorageService.SetItemAsync<string>("JwtToken", result!.AccessToken!);
+            navigationManager.NavigateTo("/");
+
         }
         else
         {

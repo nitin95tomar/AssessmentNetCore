@@ -23,6 +23,7 @@ builder.Services
     .AddMaterialIcons();
 builder.Services.AddScoped<IUser, User>();
 builder.Services.AddScoped<IPatientService, PatientService>();
+builder.Services.AddScoped<IProgressNoteService, ProgressNoteService>();
 builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
 builder.Services.AddBlazoredLocalStorage();
 builder.Services.AddScoped<AuthenticationStateProvider, CustomAuthenticationStateProvider>();

@@ -9,7 +9,6 @@ namespace WebAPI.Controllers
 {
     [ApiController]
     [Route("[controller]")]
-    [Authorize]
     public class ProgressNoteController : ControllerBase
     {
         private readonly IProgressNoteRepository progressNoteRepository;

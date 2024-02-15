@@ -44,8 +44,8 @@
     <Content Remove="OpenAPIs\swagger.json" />
   </ItemGroup>
   <ItemGroup>
-    <OpenApiReference Include="OpenAPIs\swagger.json">
-      <SourceUri>https://localhost:51665/swagger/v1/swagger.json</SourceUri>
+    <OpenApiReference Include="OpenAPIs\swagger.json" Namespace="WebUI.Swagger">
+      <SourceUri>https://localhost:5215/swagger/v1/swagger.json</SourceUri>
     </OpenApiReference>
   </ItemGroup>
 </Project>
